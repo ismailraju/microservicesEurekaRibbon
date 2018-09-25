@@ -1,0 +1,8 @@
+ ##DOCKER IMAGE CREATE COMMAND
+ ==============================
+
+ $  docker build -f Dockerfile -t dockerspringboot .
+ $  ducker images
+ $  docker images
+ $  docker run -p 8085:8085 dockerspringboot
+
