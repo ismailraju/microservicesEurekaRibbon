@@ -7,12 +7,14 @@ package com.raju.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  *
  * @author ismail
  */
 @Entity
+@Table(name = "User1")
 public class User {
 
     @Id
