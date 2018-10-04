@@ -1,0 +1,83 @@
+
+
+Install ElasticSearch
+=================================
+
+docker pull docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+
+docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.3.2
+
+
+
+
+
+logstash install
+============================
+#
+#
+
+sudo apt-get install apt-transport-https
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.3.list
+echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.3.2.list
+sudo apt-get update && sudo apt-get install logstash
+
+
+#
+#
+
+/usr/share/logstash/bin/logstash -f /etc/logstash/logstash-sample.conf 
+gedit /etc/logstash/logstash-sample.conf 
+sudo chmod -R 777 /etc/logstash/
+bin/logstash -f /etc/logstash/logstash-sample.conf 
+
+##bin/logstash -f /etc/logstash/logstash-sample.conf --path.setting /etc/logstash
+##cd /etc/logstash/
+
+ps aux | grep logstash
+kill 4677228
+
+
+#
+#
+#
+
+logstash-sample.conf 
+======================================
+
+input {
+jdbc { 
+jdbc_connection_string => "jdbc:mysql://192.168.10.156:3306/moe_dev"
+# The user we wish to execute our statement as
+jdbc_user => "moes"
+jdbc_password => "moes@IstL321"
+# The path to our downloaded jdbc driver
+jdbc_driver_library => "/home/ismail/NetBeansProjects/sesp/SESPMIS/lib/mysql-connector-java-5.1.18-bin.jar"
+jdbc_driver_class => "com.mysql.jdbc.Driver"
+# our query
+schedule => '* * * * *'
+statement => "SELECT * FROM `beneficiary`"
+use_column_value => true
+tracking_column => full_name_in_english
+jdbc_paging_enabled => "true"
+jdbc_page_size => "100000"
+}
+}
+output {
+stdout { codec => json_lines }
+elasticsearch {
+"hosts" => "localhost:9200"
+"index" => "moe_dev"
+"document_type" => "data"
+"document_id" => "%{id}"
+}
+}
+
+
+
+==================================================================================
+
+#
+#
+#
+#
